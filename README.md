@@ -1,73 +1,130 @@
-# React + TypeScript + Vite
+# Campaign OS — GEO Strategic Hub
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A professional **Generative Engine Optimization (GEO)** strategy platform for marketing and product teams. The tool helps you analyze how AI models perceive your product, identify content gaps, and generate AI-citation-optimized content.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Architecture
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── pages/
+│   ├── v1/          # Campaign OS: step-by-step workflow
+│   ├── v2/          # Intelligence Layer: real-time monitoring
+│   └── LegacyGeoFlow.tsx  # Original 3-step GEO wizard
+├── components/
+│   ├── v1/          # V1-specific UI components
+│   ├── v2/          # V2-specific UI components
+│   └── ErrorBoundary.tsx
+├── services/
+│   ├── geminiService.ts       # Gemini API (analysis, content, grounding)
+│   ├── multiModelService.ts   # DeepSeek / Qwen / Doubao / Kimi
+│   ├── promptBuilder.ts       # 5-layer prompt architecture
+│   └── geoMethods.ts          # GEO optimization method definitions
+├── store/
+│   └── workflowStore.ts       # Zustand global state (persisted)
+├── config/
+│   └── models.ts              # Model IDs + configurable constants
+├── utils/
+│   └── geo.ts                 # Shared Europe/Mistral region detection
+└── i18n/
+    └── translations.ts        # zh / en / jp UI strings
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### V1 — Campaign OS (step-by-step)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+| Step | Route | Description |
+|---|---|---|
+| Dashboard | `/dashboard` | Overview, quick actions |
+| Product Intake | `/product-intake` | Parse product specs into a structured model |
+| Market Mapping | `/market-mapping` | Competitor + corpus analysis |
+| Brief Builder | `/brief-builder` | Campaign brief generation |
+| Strategy Studio | `/strategy-studio` | GEO playbook selection |
+| Activation Studio | `/activation-studio` | AI-optimized content production |
+| Campaigns | `/campaigns` | Campaign list |
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### V2 — Intelligence Layer
+
+| Module | Route | Description |
+|---|---|---|
+| Control Tower | `/control-tower` | Campaign health score + KPIs |
+| Signal Radar | `/signal-radar` | Market signal feed + filtering |
+| War Room | `/war-room` | Competitive intelligence |
+| Message Lab | `/message-lab` | Audience resonance testing |
+| Optimization | `/optimization` | Experiment queue + recommendations |
+| Integrations | `/integrations` | API connector management |
+| Reports | `/reports` | Generated strategy reports |
+
+---
+
+## Setup
+
+### Prerequisites
+
+- Node.js 18+
+- A Google Gemini API key (required for core analysis)
+
+### Install & run
+
+```bash
+npm install
+npm run dev
 ```
+
+### Environment variables
+
+Create a `.env.local` file (never commit this):
+
+```env
+# Required — core analysis engine
+VITE_GEMINI_API_KEY=your_gemini_api_key
+
+# Optional — multi-model verification (cross-validates AI perceptions)
+VITE_DEEPSEEK_API_KEY=your_deepseek_key
+VITE_QWEN_API_KEY=your_qwen_key
+VITE_DOUBAO_API_KEY=your_doubao_key          # supports "apiKey|endpointId" format
+VITE_Kimi_API_KEY=your_kimi_key
+
+# Optional — report attribution (shown in generated reports)
+VITE_REPORTER_EMAIL=your@email.com
+VITE_REPORTER_ORG=Your Organization
+```
+
+> **Security note**: All `VITE_*` vars are bundled into the browser JS. For production, route API calls through the included `server.js` proxy instead.
+
+### Production build
+
+```bash
+npm run build
+npm run preview
+```
+
+### Docker
+
+```bash
+docker build -t campaign-os .
+docker run -p 3000:3000 -e VITE_GEMINI_API_KEY=... campaign-os
+```
+
+---
+
+## Supported Ecosystems
+
+| ID | Target AI models |
+|---|---|
+| `global` | ChatGPT, Claude, Gemini, Perplexity (+ Mistral for European regions) |
+| `cn` | Doubao/豆包, Kimi, DeepSeek, Qwen/通义千问, ERNIE/文心一言, 元宝 |
+| `jp` | Yahoo/Line AI, Claude, GPT-4o |
+| `kr` | Naver CUE:, GPT-4o |
+
+---
+
+## Tech Stack
+
+- **React 19** + **TypeScript** — UI
+- **Vite 8** — build tooling
+- **Tailwind CSS v4** — styling
+- **Zustand v5** — state management (localStorage-persisted)
+- **React Router v7** — routing with route-level lazy loading
+- **Google Gemini** (`@google/genai`) — analysis, grounding, content generation
+- **Lucide React** — icons

@@ -290,7 +290,10 @@ Be direct and concise (max 200 words). Mention specific product names, model num
     error: 'API key not configured',
   });
 
-  const isConfigured = (key: string) => key && !key.includes('your_');
+  // A key is considered configured when it exists, is not a placeholder,
+  // and meets a minimum plausible length (real API keys are typically ≥20 chars).
+  const isConfigured = (key: string) =>
+    key.length >= 20 && !key.includes('your_') && !key.startsWith('sk-placeholder');
 
   const [deepseekSnapshot, qwenSnapshot, doubaoSnapshot, kimiSnapshot] = await Promise.all([
     isConfigured(deepseekKey)
