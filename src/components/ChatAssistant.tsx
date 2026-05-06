@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { MessageSquare, X, Send, Loader2, Bot } from 'lucide-react';
 import { useWorkflowStore } from '../store/workflowStore';
 import { chatWithAssistant } from '../services/geminiService';
@@ -8,66 +8,62 @@ const ChatAssistant: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
-  const { 
-    chatHistory, 
-    addChatMessage, 
-    uiLang, 
-    selectedMonitoringQuestions, 
+  // Bounce once on mount, then stop
+  const [bouncing, setBouncing] = useState(true);
+
+  const {
+    chatHistory,
+    addChatMessage,
+    uiLang,
+    selectedMonitoringQuestions,
     selectedPlaybooks,
     currentStep
   } = useWorkflowStore();
-  
+
   const t = translations[uiLang] as any;
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  useEffect(() => {
+    const timer = setTimeout(() => setBouncing(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
-      scrollToBottom();
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [chatHistory, isOpen]);
 
-  const handleSend = async () => {
+  const handleSend = useCallback(async () => {
     if (!input.trim() || isLoading) return;
-    
+
     const userMessage = input.trim();
     setInput('');
     addChatMessage({ role: 'user', content: userMessage });
     setIsLoading(true);
 
     try {
-      const contextData = {
-        currentStep,
-        selectedMonitoringQuestions,
-        selectedPlaybooks
-      };
-      
-      const response = await chatWithAssistant(
-        userMessage, 
-        chatHistory, 
-        contextData, 
-        uiLang
-      );
-      
+      const contextData = { currentStep, selectedMonitoringQuestions, selectedPlaybooks };
+      const response = await chatWithAssistant(userMessage, chatHistory, contextData, uiLang);
       addChatMessage({ role: 'assistant', content: response || '' });
     } catch (error) {
       console.error(error);
-      addChatMessage({ role: 'assistant', content: "Sorry, I encountered an error answering your request." });
+      addChatMessage({
+        role: 'assistant',
+        content: t.chatError || 'Sorry, an error occurred. Please try again.',
+      });
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [input, isLoading, chatHistory, currentStep, selectedMonitoringQuestions, selectedPlaybooks, uiLang, addChatMessage, t]);
 
   return (
     <>
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 w-14 h-14 bg-[#03234b] text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-[#0a3d7a] transition-all z-50 animate-bounce"
+          className={`fixed bottom-6 right-6 w-14 h-14 bg-[#03234b] text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-[#0a3d7a] transition-all z-50 ${bouncing ? 'animate-bounce' : ''}`}
+          aria-label={t.chatTitle || 'GEO Assistant'}
         >
           <MessageSquare className="w-6 h-6" />
         </button>
@@ -75,13 +71,13 @@ const ChatAssistant: React.FC = () => {
 
       {isOpen && (
         <div className="fixed bottom-6 right-6 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 transition-all h-[500px] max-h-[80vh]">
-          
+
           <div className="bg-[#03234b] text-white px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Bot className="w-5 h-5 text-[#3cb4e6]" />
-              <span className="font-bold text-sm tracking-wide">{t.chatTitle || "GEO Assistant"}</span>
+              <span className="font-bold text-sm tracking-wide">{t.chatTitle || 'GEO Assistant'}</span>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-slate-300 hover:text-white transition-colors">
+            <button onClick={() => setIsOpen(false)} className="text-slate-300 hover:text-white transition-colors" aria-label="Close">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -90,17 +86,17 @@ const ChatAssistant: React.FC = () => {
             {chatHistory.length === 0 && (
               <div className="flex justify-start">
                 <div className="bg-white border border-slate-200 text-slate-700 p-3 rounded-2xl rounded-tl-sm text-sm shadow-sm max-w-[85%]">
-                  {t.chatInitial || "Hi! I am your GEO Assistant. How can I help you interpret the current insights?"}
+                  {t.chatInitial || 'Hi! I am your GEO Assistant. How can I help you interpret the current insights?'}
                 </div>
               </div>
             )}
-            
+
             {chatHistory.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div 
+                <div
                   className={`p-3 rounded-2xl text-xs md:text-sm shadow-sm max-w-[85%] whitespace-pre-wrap leading-relaxed ${
-                    msg.role === 'user' 
-                      ? 'bg-[#03234b] text-white rounded-tr-sm' 
+                    msg.role === 'user'
+                      ? 'bg-[#03234b] text-white rounded-tr-sm'
                       : 'bg-white border border-slate-200 text-slate-700 rounded-tl-sm prose prose-sm prose-slate'
                   }`}
                 >
@@ -108,11 +104,12 @@ const ChatAssistant: React.FC = () => {
                 </div>
               </div>
             ))}
-            
+
             {isLoading && (
               <div className="flex justify-start">
                 <div className="bg-white border border-slate-200 text-slate-700 p-3 rounded-2xl rounded-tl-sm text-sm shadow-sm flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 text-[#3cb4e6] animate-spin" /> Thinking...
+                  <Loader2 className="w-4 h-4 text-[#3cb4e6] animate-spin" />
+                  {t.chatThinking || 'Thinking...'}
                 </div>
               </div>
             )}
@@ -125,7 +122,7 @@ const ChatAssistant: React.FC = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder={t.chatPlaceholder || "Type a message..."}
+              placeholder={t.chatPlaceholder || 'Type a message...'}
               className="flex-1 bg-slate-100 border-none rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3cb4e6]"
               disabled={isLoading}
             />
@@ -133,6 +130,7 @@ const ChatAssistant: React.FC = () => {
               onClick={handleSend}
               disabled={!input.trim() || isLoading}
               className="bg-[#ffd200] text-[#03234b] p-2 rounded-full hover:bg-[#ffe24d] disabled:opacity-50 transition-colors"
+              aria-label="Send"
             >
               <Send className="w-4 h-4" />
             </button>

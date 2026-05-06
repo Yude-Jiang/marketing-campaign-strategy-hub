@@ -105,7 +105,7 @@ const ActivationStudioPage: React.FC = () => {
     return (
       <div className="min-h-full">
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => navigate('/v1/dashboard')} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-[#03234b] transition-colors">
+          <button onClick={() => navigate('/dashboard')} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-[#03234b] transition-colors">
             <ArrowLeft className="w-3.5 h-3.5" />
             Dashboard
           </button>
@@ -121,7 +121,7 @@ const ActivationStudioPage: React.FC = () => {
     <div className="min-h-full">
       {/* ── Back nav ─────────────────────────────────────────────── */}
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate('/v1/dashboard')} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-[#03234b] transition-colors">
+        <button onClick={() => navigate('/dashboard')} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-[#03234b] transition-colors">
           <ArrowLeft className="w-3.5 h-3.5" />
           Dashboard
         </button>

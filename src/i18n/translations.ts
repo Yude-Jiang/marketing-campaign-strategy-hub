@@ -202,6 +202,7 @@ export const translations = {
     chatTitle: 'GEO 助理',
     chatPlaceholder: '输入您的疑惑或战略问题...',
     chatInitial: '你好！我是你的专属 GEO 助理。基于当前的面板数据，有哪些我可以帮您的？',
+    chatError: '抱歉，处理您的请求时出现错误，请稍后重试。',
     hints: {
       insight: '解读大模型当前对该技术的刻板印象，寻找认知主权缺口。',
       painPoint: '这些是真正的网络痛点，重点勾选 AI 知识断层或回答较差的区域。',
@@ -409,6 +410,7 @@ export const translations = {
     chatTitle: 'GEO Assistant',
     chatPlaceholder: 'Ask a question...',
     chatInitial: 'Hi! I am your GEO Assistant. How can I help you interpret the current insights?',
+    chatError: 'Sorry, an error occurred while processing your request. Please try again.',
     hints: {
       insight: 'Interpret the LLMs current stereotypes about this technology to find cognitive gaps.',
       painPoint: 'These are real pain points. Select the areas where AI performs worst.',
@@ -617,6 +619,7 @@ export const translations = {
     chatTitle: 'GEO アシスタント',
     chatPlaceholder: 'メッセージを入力...',
     chatInitial: 'こんにちは！現在のインサイトやプレイブックについて、何かお手伝いできることはありますか？',
+    chatError: '申し訳ありません。リクエストの処理中にエラーが発生しました。もう一度お試しください。',
     hints: {
       insight: 'この技術に対する LLM の現在の固定観念を解釈し、認知主権のギャップを探します。',
       painPoint: '実際のペインポイントです。AI の回答精度が最も低い領域を選択してください。',

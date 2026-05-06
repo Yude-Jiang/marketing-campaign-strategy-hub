@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, FileText, Globe, Database } from 'lucide-react';
 import type { ProductMetaInput, ProductIntakeStatus, ProductTruthModel } from '../../types/product';
@@ -25,71 +25,48 @@ const INITIAL_META: ProductMetaInput = {
 const ProductIntakePage: React.FC = () => {
   const navigate = useNavigate();
 
-  // Store-bound persisted state
-  const storeTruth = useWorkflowStore(s => s.productTruth);
-  const storeStatus = useWorkflowStore(s => s.productIntakeStatus);
+  // Store is the single source of truth for truth/status
+  const truth = useWorkflowStore(s => s.productTruth);
+  const status = useWorkflowStore(s => s.productIntakeStatus);
   const setStoreTruth = useWorkflowStore(s => s.setProductTruth);
   const setStoreStatus = useWorkflowStore(s => s.setProductIntakeStatus);
 
-  // Local form state
   const [meta, setMeta] = useState<ProductMetaInput>(INITIAL_META);
-  const [truth, setTruth] = useState<ProductTruthModel | null>(storeTruth);
-  const [status, setStatus] = useState<ProductIntakeStatus>(storeStatus);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  // Keep local truth/status in sync when store changes (e.g. page revisit)
-  useEffect(() => {
-    if (storeTruth && !truth) setTruth(storeTruth);
-    if (storeStatus !== 'empty' && status === 'empty') setStatus(storeStatus);
-  }, [storeTruth, storeStatus]); // only on mount / store hydration
-
-  // ── Parse handler (mock) ─────────────────────────────────────────────
   const [parsing, setParsing] = useState(false);
 
   const handleParse = useCallback(async () => {
     if (!meta.productName.trim()) return;
     setParsing(true);
-    setStatus('parsing');
+    setStoreStatus('parsing');
     setErrorMessage(null);
 
-    // Simulate 800 ms API call
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    // Mock: always succeed with the mock product truth
-    setTruth(MOCK_PRODUCT_TRUTH);
-    setStatus('ready_to_confirm');
+    setStoreTruth(MOCK_PRODUCT_TRUTH);
+    setStoreStatus('ready_to_confirm');
     setParsing(false);
-  }, [meta.productName]);
+  }, [meta.productName, setStoreTruth, setStoreStatus]);
 
   // ── Confirm handler ──────────────────────────────────────────────────
   const handleConfirm = useCallback(() => {
     if (!truth) return;
-    setStatus('confirmed');
-    setStoreTruth(truth);
     setStoreStatus('confirmed');
-  }, [truth, setStoreTruth, setStoreStatus]);
+  }, [truth, setStoreStatus]);
 
   // ── Edit handler (called from ProductTruthPreview) ───────────────────
   const handleEdit = useCallback((updated: ProductTruthModel) => {
-    setTruth(updated);
-  }, []);
+    setStoreTruth(updated);
+  }, [setStoreTruth]);
 
   // ── Reset handler ────────────────────────────────────────────────────
   const handleReset = useCallback(() => {
     setMeta(INITIAL_META);
-    setTruth(null);
-    setStatus('empty');
     setErrorMessage(null);
     setStoreTruth(null);
     setStoreStatus('empty');
   }, [setStoreTruth, setStoreStatus]);
 
-  // ── Combined parse trigger (also called from form) ───────────────────
-  const onParse = useCallback(() => {
-    handleParse();
-  }, [handleParse]);
-
-  // Derive effective status (loading overlay during mock parse)
   const effectiveStatus: ProductIntakeStatus = parsing ? 'parsing' : status;
 
   return (
@@ -97,7 +74,7 @@ const ProductIntakePage: React.FC = () => {
       {/* ── Back nav ─────────────────────────────────────────────── */}
       <div className="flex items-center gap-3 mb-6">
         <button
-          onClick={() => navigate('/v1/dashboard')}
+          onClick={() => navigate('/dashboard')}
           className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-[#03234b] transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
@@ -128,7 +105,7 @@ const ProductIntakePage: React.FC = () => {
             onChange={setMeta}
             status={effectiveStatus}
             errorMessage={errorMessage}
-            onParse={onParse}
+            onParse={handleParse}
             onReset={handleReset}
           />
 

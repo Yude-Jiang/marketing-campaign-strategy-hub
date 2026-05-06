@@ -21,6 +21,7 @@ import type { PlaybookAnchorBundle, MonitoringQuestion } from '../types';
 import { buildAnnotatedContext } from './structuralParser';
 import { buildMethodDirectives } from './geoMethods';
 import type { GeoMethodId } from './geoMethods';
+import { isEuropeRegion } from '../utils/geo';
 
 export interface ContentPromptParams {
   platform: string;
@@ -39,15 +40,6 @@ export interface ContentPromptParams {
   ecosystem?: string;
   /** Region override from diagnosis step — used for Mistral AI consideration */
   customRegion?: string;
-}
-
-// ─── Europe/Mistral detection (mirrors geminiService.ts) ─────────────────────
-
-const EUROPE_KW = ['europe', 'eu ', 'eu,', 'emea', '欧洲', '欧盟', 'europa', 'france', 'germany', 'deutschland', 'united kingdom', 'britain', 'netherlands', 'spain', 'italy', 'nordic', 'scandinavia', 'benelux', 'swiss', 'austria', 'belgium', 'poland', 'czech'];
-function isEuropeRegion(region?: string): boolean {
-  if (!region) return false;
-  const lower = region.toLowerCase();
-  return EUROPE_KW.some(kw => lower.includes(kw));
 }
 
 // ─── Layer 1: System ─────────────────────────────────────────────────────────

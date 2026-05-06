@@ -3,7 +3,8 @@ import type { AnalysisResult, MonitoringQuestion, MarketStrategy, PlaybookAnchor
 import { buildContentPrompt } from "./promptBuilder";
 import { buildMethodDirectives } from "./geoMethods";
 import type { GeoMethodId } from "./geoMethods";
-import { GEMINI_MODELS } from "../config/models";
+import { GEMINI_MODELS, REPORTER_EMAIL, REPORTER_ORG } from "../config/models";
+import { isEuropeRegion } from "../utils/geo";
 
 // Initialize with Runtime env (from server.js) or Vite env (built-in)
 const apiKey = (window as any).env?.VITE_GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY || '';
@@ -68,12 +69,6 @@ export const withRetry = async <T>(
 // ─────────────────────────────────────────────────────────────────────────────
 
 
-const EUROPE_KEYWORDS = ['europe', 'eu ', 'eu,', 'emea', '欧洲', '欧盟', 'europa', 'france', 'germany', 'deutschland', 'united kingdom', 'britain', 'netherlands', 'spain', 'italy', 'nordic', 'scandinavia', 'benelux', 'swiss', 'austria', 'belgium', 'poland', 'czech'];
-function isEuropeRegion(region?: string): boolean {
-  if (!region) return false;
-  const lower = region.toLowerCase();
-  return EUROPE_KEYWORDS.some(kw => lower.includes(kw));
-}
 
 const getSystemInstruction = (lang: string, customRegion?: string, targetEcosystem?: string) => {
   const now = new Date();
@@ -1110,12 +1105,12 @@ TARGET ECOSYSTEM: ${p.ecosystem || 'Global'} | REGION: ${p.customRegion || 'Glob
 
 MANDATORY REPORT STRUCTURE:
 # GEO ${hasFullWorkflow ? 'Strategic' : 'Optimization'} Report: ${topic}
-**Date**: ${date} | **Ecosystem**: ${p.ecosystem || 'Global'}${p.customRegion ? ` | **Region**: ${p.customRegion}` : ''} | **By**: Yude.jiang@st.com
+**Date**: ${date} | **Ecosystem**: ${p.ecosystem || 'Global'}${p.customRegion ? ` | **Region**: ${p.customRegion}` : ''} | **By**: ${REPORTER_EMAIL}
 
 ${structureNote}
 
 ---
-*${date} © 2026 GEO Strategic Hub • Created by Yude.jiang@st.com*
+*${date} © ${new Date().getFullYear()} ${REPORTER_ORG} • Created by ${REPORTER_EMAIL}*
 
 CRITICAL: Generate the full professional report. Be specific and data-driven. Reference actual numbers from the data. No generic platitudes.
 
