@@ -7,7 +7,6 @@ dist
 Dockerfile
 README.md
 screenshot.png
-check.mjs
-test-search.ts
-test-search2.ts
-testApi.mjs
+docs
+.github
+.claude

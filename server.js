@@ -18,6 +18,8 @@ app.get('/config.js', (req, res) => {
     VITE_QWEN_API_KEY:     process.env.VITE_QWEN_API_KEY     || '',
     VITE_DOUBAO_API_KEY:   process.env.VITE_DOUBAO_API_KEY   || '',
     VITE_Kimi_API_KEY:     process.env.VITE_Kimi_API_KEY     || '',
+    VITE_REPORTER_EMAIL:   process.env.VITE_REPORTER_EMAIL   || '',
+    VITE_REPORTER_ORG:     process.env.VITE_REPORTER_ORG     || '',
   };
   res.set('Content-Type', 'application/javascript');
   res.send(`window.env = ${JSON.stringify(envVars)};`);
