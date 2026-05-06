@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { UILang } from '../i18n/translations';
+import type { ProductTruthModel, ProductIntakeStatus } from '../types/product';
+import type { MarketInterpretationModel, MarketMappingStatus } from '../types/market';
+import type { CampaignBriefModel, BriefStatus } from '../types/brief';
+import type { StrategyPackModel, StrategyStatus } from '../types/strategy';
+import type { AssetRecord } from '../types/activation';
 
 export type Ecosystem = 'global' | 'cn' | 'jp' | 'kr';
 
@@ -12,6 +17,36 @@ export interface WorkflowState {
   // UI Language
   uiLang: UILang;
   setUiLang: (lang: UILang) => void;
+
+  // Product Intake (V1)
+  productTruth: ProductTruthModel | null;
+  setProductTruth: (truth: ProductTruthModel | null) => void;
+  productIntakeStatus: ProductIntakeStatus;
+  setProductIntakeStatus: (status: ProductIntakeStatus) => void;
+
+  // Market Mapping (V1)
+  marketInterpretation: MarketInterpretationModel | null;
+  setMarketInterpretation: (model: MarketInterpretationModel | null) => void;
+  marketMappingStatus: MarketMappingStatus;
+  setMarketMappingStatus: (status: MarketMappingStatus) => void;
+
+  // Brief Builder (V1)
+  briefDraft: CampaignBriefModel | null;
+  setBriefDraft: (draft: CampaignBriefModel | null) => void;
+  briefStatus: BriefStatus;
+  setBriefStatus: (status: BriefStatus) => void;
+
+  // Strategy Studio (V1)
+  strategyPack: StrategyPackModel | null;
+  setStrategyPack: (pack: StrategyPackModel | null) => void;
+  strategyStatus: StrategyStatus;
+  setStrategyStatus: (status: StrategyStatus) => void;
+
+  // Activation Studio (V1)
+  assets: AssetRecord[];
+  setAssets: (assets: AssetRecord[]) => void;
+  activeAssetId: string | null;
+  setActiveAssetId: (id: string | null) => void;
   
   // Navigation State
   currentStep: 1 | 2 | 3;
@@ -121,6 +156,36 @@ export const useWorkflowStore = create<WorkflowState>()(
 
       customRegion: '',
       setCustomRegion: (region) => set({ customRegion: region }),
+
+      // Product Intake (V1)
+      productTruth: null,
+      setProductTruth: (truth) => set({ productTruth: truth }),
+      productIntakeStatus: 'empty' as ProductIntakeStatus,
+      setProductIntakeStatus: (status) => set({ productIntakeStatus: status }),
+
+      // Market Mapping (V1)
+      marketInterpretation: null,
+      setMarketInterpretation: (model) => set({ marketInterpretation: model }),
+      marketMappingStatus: 'idle' as MarketMappingStatus,
+      setMarketMappingStatus: (status) => set({ marketMappingStatus: status }),
+
+      // Brief Builder (V1)
+      briefDraft: null,
+      setBriefDraft: (draft) => set({ briefDraft: draft }),
+      briefStatus: 'draft' as BriefStatus,
+      setBriefStatus: (status) => set({ briefStatus: status }),
+
+      // Strategy Studio (V1)
+      strategyPack: null,
+      setStrategyPack: (pack) => set({ strategyPack: pack }),
+      strategyStatus: 'empty' as StrategyStatus,
+      setStrategyStatus: (status) => set({ strategyStatus: status }),
+
+      // Activation Studio (V1)
+      assets: [],
+      setAssets: (assets) => set({ assets }),
+      activeAssetId: null,
+      setActiveAssetId: (id) => set({ activeAssetId: id }),
     }),
     {
       name: 'geo-hub-storage', // saves to localStorage

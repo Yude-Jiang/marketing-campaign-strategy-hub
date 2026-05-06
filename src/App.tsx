@@ -16,9 +16,9 @@ import MarketMapping    from './pages/v1/MarketMapping';
 import BriefBuilder     from './pages/v1/BriefBuilder';
 import StrategyStudio   from './pages/v1/StrategyStudio';
 import ActivationStudio from './pages/v1/ActivationStudio';
-import Campaigns        from './pages/v1/Campaigns';
 
 // V2 — Intelligence Layer
+import Campaigns     from './pages/v2/Campaigns';
 import ControlTower  from './pages/v2/ControlTower';
 import SignalRadar   from './pages/v2/SignalRadar';
 import WarRoom       from './pages/v2/WarRoom';
